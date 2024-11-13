@@ -62,14 +62,16 @@ def process_rfi_cells(sheet):
 
     for row_number in range(4, len(all_values) + 1):  # Start from row 4 to the last row
         row_data = sheet.row_values(row_number)  # Get the values of the specified row
-        rfi_found = any("RFI" in cell for cell in row_data if cell)  # Check for "RFI" in non-empty cells
+
+        # Returns a boolean if any non-empty cells are found with the "RFI" substring - Exclude AJ (column 35)
+        rfi_found = any("RFI" in cell for index, cell in enumerate(row_data) if index != 35 and cell)  
 
         # Get the Implementation Identifier from header index C (index 2)
         implementation_identifier = row_data[2] if len(row_data) > 2 else None  # Ensure the row has enough data
 
-        # Create a list of dictionaries for columns containing "RFI"
+        # Create a list of dictionaries for columns containing "RFI", excluding column AJ
         for index, cell in enumerate(row_data):
-            if "RFI" in cell:
+            if index != 35 and "RFI" in cell:  # Exclude column AJ (index 35)
                 column_reference = index_to_excel_column(index + 1)  # Convert index to Excel-style column reference
                 rfi_entries.append({
                     "column_header": headers[index],
