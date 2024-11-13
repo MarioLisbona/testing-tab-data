@@ -1,3 +1,6 @@
 els-testing-sheet-eb7495e198ae.json
 .env
 rfi.json
+__pycache__/
+lib/__pycache__/
+**/__pycache__/
