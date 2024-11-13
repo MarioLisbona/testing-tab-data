@@ -1,10 +1,21 @@
+import os
+import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from dotenv import load_dotenv  # Make sure to install python-dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set up the Google Sheets API
 def setup_google_sheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name('els-testing-sheet-eb7495e198ae.json', scope)
+    
+    # Load credentials from environment variable
+    creds_json = os.getenv('GOOGLE_SHEET_CREDENTIALS')
+    creds_dict = json.loads(creds_json)  # Parse the JSON string into a dictionary
+    
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
     return client
 
