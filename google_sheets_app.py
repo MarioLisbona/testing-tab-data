@@ -52,31 +52,35 @@ def log_last_column_with_data(sheet):
     else:
         print("No data found in the sheet.")
 
+# Function to check for "RFI" in a row and update column AJ
+def check_rfi_in_row(sheet, row_number):
+    row_data = sheet.row_values(row_number)  # Get the values of the specified row
+    headers = sheet.row_values(3)  # Get the column headers from row 3
+    rfi_found = any("RFI" in cell for cell in row_data if cell)  # Check for "RFI" in non-empty cells
+
+    # Create a list of dictionaries for columns containing "RFI"
+    rfi_columns = []
+    for index, cell in enumerate(row_data):
+        if "RFI" in cell:
+            column_reference = index_to_excel_column(index + 1)  # Convert index to Excel-style column reference
+            rfi_columns.append({headers[index]: {'value': cell, 'reference': column_reference}})  # Include the column heading and reference
+
+    # Update cell AJ[row_number] based on the presence of "RFI"
+    if rfi_found:
+        sheet.update(range_name=f'AJ{row_number}', values=[['In Progress - awaiting RFI']])
+    else:
+        sheet.update(range_name=f'AJ{row_number}', values=[['Yes - no issues']])
+    
+    return rfi_columns  # Return the list of dictionaries
+
 # Example usage
 def main():
     client = setup_google_sheets()
     sheet = client.open("Testing output-MYOM-IHEAB-Testing").worksheet("Testing")  # Access the "Testing" tab
 
-    # Log the number of rows with data and the first empty row
-    log_row_data(sheet)
-
-    # Log the last column with data
-    log_last_column_with_data(sheet)
-
-    # Get values from cells E3 and E4
-    cell_e3 = sheet.acell('E3').value
-    cell_e4 = sheet.acell('E4').value
-
-    # Log the values
-    print("Value in E3:", cell_e3)
-    print("Value in E4:", cell_e4)
-
-    # Update the value in E4 to "test"
-    sheet.update(range_name='E4', values=[['test']])  # Use named arguments
-
-    # Confirm the update
-    updated_cell_e4 = sheet.acell('E4').value
-    print("Updated value in E4:", updated_cell_e4)
+    # Check RFI in a specific row (for example, row 5)
+    # print(check_rfi_in_row(sheet, 4))  # Call the new function for row 5
+    print(check_rfi_in_row(sheet, 25))  # Call the new function for row 5
 
 if __name__ == "__main__":
     main()
